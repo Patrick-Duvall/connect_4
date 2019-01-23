@@ -62,28 +62,29 @@
       combos.any?{|combo| all_equal?(combo)}
     end
 
-# Finds diagonals by 
+#finds diagonals by padding each row with nils, then transposing to get columns,
+#then compacting to remove extra nils
     def wins_diagonal_forwards
-      padding = @board.size - 1
-      padded_matrix = []
+      paddingR = @board.size - 1
+      diags = []
       @board.each do |row|
-        inverse_padding = @board.size - padding
-        padded_matrix << ([nil] * inverse_padding) + row + ([nil] * padding)
-        padding -= 1
+        paddingL = @board.size - paddingR
+        diags << ([nil] * paddingL) + row + ([nil] * paddingR)
+        paddingR -= 1
       end
-      padded_matrix.transpose.map(&:compact)
+      diags.transpose.map(&:compact)
     end
 
 
         def wins_diagonal_backwards
-          padding = 1
-          padded_matrix = []
+          paddingL = @board.size - 1
+          diags = []
           @board.each do |row|
-            inverse_padding = @board.size - padding
-            padded_matrix << ([nil] * inverse_padding) + row + ([nil] * padding)
-            padding += 1
+            paddingR = @board.size - paddingL
+            diags << ([nil] * paddingL) + row + ([nil] * paddingR)
+            paddingL -= 1
           end
-          padded_matrix.transpose.map(&:compact)
+          diags.transpose.map(&:compact)
         end
 
         def wins_diagonal_combined
