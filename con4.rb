@@ -2,11 +2,16 @@
   class Board
     def initialize
       @board = Array.new(6) { Array.new(7) { "." } }
+      @player = 'human'
+    end
+
+    def switch_player
+    @player == 'human' ? @player = 'computer' : @player = 'human'
     end
 
     def print_board
-      puts 'ABCDEFG'
-      @board.each{|el| puts el.join}
+      puts 'A B C D E F G'
+      @board.each{|el| puts el.join(' ')}
     end
 
     def move_to_index(move_column)
@@ -26,25 +31,28 @@
     def player_move
       column = get_move()
       if column_available?(column)
-      count = -1
-      until @board[count][column] == '.'
-        count -= 1
-      end
-      @board[count][column] = 'X'
+        count = -1
+        until @board[count][column] == '.'
+          count -= 1
+        end
+        @board[count][column] = 'X'
       else
         puts 'Column full, please enter a different move.'
         player_move()
       end
     end
-
+#Bug, cant move onto full columns, crashes
     def comp_move
       column = (0..6).to_a.sample
-      comp_move until column_available?(column)
-      count = -1
-      until @board[count][column] == '.'
-        count -= 1
+      if column_available?(column)
+        count = -1
+        until @board[count][column] == '.'
+          count -= 1
+        end
+        @board[count][column] = 'O'
+      else
+        comp_move()
       end
-      @board[count][column] = 'O'
     end
 
     def all_equal?(array)
@@ -62,7 +70,7 @@
       combos.any?{|combo| all_equal?(combo)}
     end
 
-# Finds diagonals by 
+# Finds diagonals by
     def wins_diagonal_forwards
       padding = @board.size - 1
       padded_matrix = []
@@ -88,19 +96,20 @@
 
         def wins_diagonal_combined
           diagonals = wins_diagonal_forwards + wins_diagonal_backwards
-          p diagonals
+
           diagonals.any? {|diag|diag.each_cons(4).to_a.any? { |combo| all_equal?(combo) } }
+        end
+        def won?
+          wins_diagonal_combined || wins_vertical || wins_horizontal
+        end
+        def drawn?
+          @board.flatten.none?{|space| space == '.'} && !won?()
+        end
+        def who_won
+          puts @player == 'human' ? 'You win!' : 'Computer wins'
+        end
+        def game_over?
+          drawn? || won?
         end
 
   end
-
-board = Board.new
-
-10.times do
-  board.player_move
-  end
-board.print_board
-
-# p board.wins_diagonal_forwards
-# p board.wins_diagonal_backwards
-p board.wins_diagonal_combined
